@@ -4,6 +4,13 @@ import (
 	"fmt"
 	"math/rand"
 	"strings"
+	"time"
+)
+
+const (
+	initialStamina = 80
+	initialAttack  = 5
+	initialDefence = 10
 )
 
 func randint(min, max int) int {
@@ -11,56 +18,51 @@ func randint(min, max int) int {
 }
 
 func attack(charName, charClass string) string {
-	if charClass == "warrior" {
+	switch charClass {
+	case "warrior":
 		return fmt.Sprintf("%s нанес урон противнику, равный %d.", charName, randint(8, 10))
-	}
-
-	if charClass == "mage" {
+	case "mage":
 		return fmt.Sprintf("%s нанес урон противнику, равный %d.", charName, randint(10, 15))
-	}
-
-	if charClass == "healer" {
+	case "healer":
 		return fmt.Sprintf("%s нанес урон противнику, равный %d.", charName, randint(2, 4))
+	default:
+		return "неизвестный класс персонажа"
 	}
-	return "неизвестный класс персонажа"
 }
 
 func defence(charName, charClass string) string {
-	if charClass == "warrior" {
+	switch charClass {
+	case "warrior":
 		return fmt.Sprintf("%s блокировал %d урона.", charName, randint(15, 20))
-	}
-	if charClass == "mage" {
+	case "mage":
 		return fmt.Sprintf("%s блокировал %d урона.", charName, randint(8, 12))
-	}
-	if charClass == "healer" {
+	case "healer":
 		return fmt.Sprintf("%s блокировал %d урона.", charName, randint(12, 15))
+	default:
+		return "неизвестный класс персонажа"
 	}
-	return "неизвестный класс персонажа"
 }
 
 func special(charName, charClass string) string {
-	if charClass == "warrior" {
-		return fmt.Sprintf("%s применил специальное умение `Выносливость %d`", charName, 80+25)
+	switch charClass {
+	case "warrior":
+		return fmt.Sprintf("%s применил специальное умение `Выносливость %d`", charName, initialStamina+25)
+	case "mage":
+		return fmt.Sprintf("%s применил специальное умение `Атака %d`", charName, initialAttack+40)
+	case "healer":
+		return fmt.Sprintf("%s применил специальное умение `Защита %d`", charName, initialDefence+30)
+	default:
+		return "неизвестный класс персонажа"
 	}
-	if charClass == "mage" {
-		return fmt.Sprintf("%s применил специальное умение `Атака %d`", charName, 5+40)
-	}
-	if charClass == "healer" {
-		return fmt.Sprintf("%s применил специальное умение `Защита %d`", charName, 10+30)
-	}
-	return "неизвестный класс персонажа"
 }
 
 func startTraining(charName, charClass string) string {
-	if charClass == "warrior" {
+	switch charClass {
+	case "warrior":
 		fmt.Printf("%s, ты Воитель — отличный боец ближнего боя.\n", charName)
-	}
-
-	if charClass == "mage" {
+	case "mage":
 		fmt.Printf("%s, ты Маг — превосходный укротитель стихий.\n", charName)
-	}
-
-	if charClass == "healer" {
+	case "healer":
 		fmt.Printf("%s, ты Лекарь — чародей, способный исцелять раны.\n", charName)
 	}
 
@@ -71,47 +73,51 @@ func startTraining(charName, charClass string) string {
 	fmt.Println("Если не хочешь тренироваться, введи команду skip.")
 
 	var cmd string
-	for cmd != "skip" {
+	for {
 		fmt.Print("Введи команду: ")
 		fmt.Scanf("%s\n", &cmd)
-		switch {
-		case cmd == "attack":
+		cmd = strings.ToLower(cmd)
+		switch cmd {
+		case "attack":
 			fmt.Println(attack(charName, charClass))
-		case cmd == "defence":
+		case "defence":
 			fmt.Println(defence(charName, charClass))
-		case cmd == "special":
+		case "special":
 			fmt.Println(special(charName, charClass))
+		case "skip":
+			return "тренировка окончена"
 		default:
 			fmt.Println("неизвестная команда")
 		}
 	}
-	return "тренировка окончена"
 }
 
 func choiceCharClass() string {
-	var approveChoice string
-	var charClass string
+	var approveChoice, charClass string
 
-	for approveChoice != "y" {
+	for strings.ToLower(approveChoice) != "y" {
 		fmt.Print("Введи название персонажа, за которого хочешь играть: Воитель — warrior, Маг — mage, Лекарь — healer: ")
 		fmt.Scanf("%s\n", &charClass)
-		if charClass == "warrior" {
+		switch charClass {
+		case "warrior":
 			fmt.Println("Воитель — дерзкий воин ближнего боя. Сильный, выносливый и отважный.")
-		}
-		if charClass == "mage" {
+		case "mage":
 			fmt.Println("Маг — находчивый воин дальнего боя. Обладает высоким интеллектом.")
-		}
-		if charClass == "healer" {
+		case "healer":
 			fmt.Println("Лекарь — могущественный заклинатель. Черпает силы из природы, веры и духов.")
+		default:
+			fmt.Println("неизвестный класс персонажа")
+			continue
 		}
 		fmt.Print("Введи (Y), чтобы подтвердить выбор, или любую другую кнопку, чтобы выбрать другого персонажа: ")
 		fmt.Scanf("%s\n", &approveChoice)
-		approveChoice = strings.ToLower(approveChoice)
 	}
 	return charClass
 }
 
 func main() {
+	rand.Seed(time.Now().UnixNano())
+
 	fmt.Println("Приветствую тебя, искатель приключений!")
 	fmt.Println("Прежде чем начать игру...")
 
@@ -120,7 +126,7 @@ func main() {
 	fmt.Scanf("%s\n", &charName)
 
 	fmt.Printf("Здравствуй, %s\n", charName)
-	fmt.Println("Сейчас твоя выносливость — 80, атака — 5 и защита — 10.")
+	fmt.Printf("Сейчас твоя выносливость — %d, атака — %d и защита — %d.\n", initialStamina, initialAttack, initialDefence)
 	fmt.Println("Ты можешь выбрать один из трёх путей силы:")
 	fmt.Println("Воитель, Маг, Лекарь")
 
